@@ -1,0 +1,14 @@
+﻿@page
+@model WebsiteBanHang.Areas.Identity.Pages.Account.RegisterModel
+
+<h2>Register</h2>
+
+<form method="post">
+
+    <input asp-for="Input.FullName" placeholder="Full name" class="form-control" />
+    <input asp-for="Input.Email" placeholder="Email" class="form-control" />
+    <input asp-for="Input.Password" type="password" placeholder="Password" class="form-control" />
+
+    <button type="submit" class="btn btn-success">Register</button>
+
+</form>
