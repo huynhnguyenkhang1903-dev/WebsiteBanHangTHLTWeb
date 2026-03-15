@@ -17,6 +17,8 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
 
+        public string ErrorMessage { get; set; } = "";
+
         public class InputModel
         {
             public string Email { get; set; } = "";
@@ -32,9 +34,11 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
                 false);
 
             if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
+            {
+                return RedirectToAction("Index", "Product");
+            }
 
-            ModelState.AddModelError("", "Login failed");
+            ErrorMessage = "Sai email hoặc mật khẩu!";
             return Page();
         }
     }

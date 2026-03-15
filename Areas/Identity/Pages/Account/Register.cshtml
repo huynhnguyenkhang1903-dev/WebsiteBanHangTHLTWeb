@@ -1,14 +1,81 @@
 ﻿@page
 @model WebsiteBanHang.Areas.Identity.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Đăng ký";
+}
 
-<h2>Register</h2>
+<div class="container mt-5">
+    <div class="row shadow-lg rounded overflow-hidden">
 
-<form method="post">
+        <!-- Hình -->
+        <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center bg-light">
+            <img src="https://cdn-icons-png.flaticon.com/512/2436/2436636.png" width="200" />
+        </div>
 
-    <input asp-for="Input.FullName" placeholder="Full name" class="form-control" />
-    <input asp-for="Input.Email" placeholder="Email" class="form-control" />
-    <input asp-for="Input.Password" type="password" placeholder="Password" class="form-control" />
+        <!-- Form -->
+        <div class="col-md-6 p-5">
 
-    <button type="submit" class="btn btn-success">Register</button>
+            <h3 class="text-center mb-4">
+                📖 Tạo tài khoản
+            </h3>
 
-</form>
+            @if (Model.SuccessMessage != null)
+            {
+                <div class="alert alert-success text-center">
+                    @Model.SuccessMessage
+                </div>
+
+                <div class="text-center">
+                    <a href="/Identity/Account/Login" class="btn btn-primary">
+                        Quay về đăng nhập
+                    </a>
+                </div>
+            }
+            else
+            {
+
+                <form method="post">
+
+                    <div class="form-group mb-3">
+                        <label>Họ tên</label>
+                        <input asp-for="Input.FullName" class="form-control" placeholder="Nhập họ tên">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label>Email</label>
+                        <input asp-for="Input.Email" class="form-control" placeholder="Nhập email">
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label>Mật khẩu</label>
+                        <input asp-for="Input.Password" type="password" class="form-control" placeholder="Nhập mật khẩu">
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        Đăng ký
+                    </button>
+
+                    <div class="text-danger mt-3">
+                        @foreach (var error in Model.Errors)
+                        {
+                            <p>@error</p>
+                        }
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center">
+                        Đã có tài khoản?
+                        <a href="/Identity/Account/Login">
+                            Đăng nhập
+                        </a>
+                    </div>
+
+                </form>
+
+            }
+
+        </div>
+
+    </div>
+</div>

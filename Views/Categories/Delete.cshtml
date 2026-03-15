@@ -1,0 +1,22 @@
+﻿@model WebsiteBanHang.Models.Category
+
+<h2>🗑 Xóa danh mục</h2>
+
+<div class="alert alert-danger">
+    Bạn có chắc muốn xóa danh mục:
+    <b>@Model.Name</b> ?
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+
+    <input type="hidden" asp-for="Id"/>
+
+    <button class="btn btn-danger">
+        Xóa
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Hủy
+    </a>
+
+</form>

@@ -1,0 +1,26 @@
+﻿@model WebsiteBanHang.Models.Category
+
+<h2>✏️ Cập nhật danh mục</h2>
+
+<div class="card shadow p-4">
+
+<form asp-action="Update" method="post">
+
+    <input type="hidden" asp-for="Id"/>
+
+    <div class="form-group mb-3">
+        <label>Tên danh mục</label>
+        <input asp-for="Name" class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-warning">
+        Cập nhật
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Quay lại
+    </a>
+
+</form>
+
+</div>

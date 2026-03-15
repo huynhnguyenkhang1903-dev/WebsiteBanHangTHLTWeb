@@ -1,0 +1,24 @@
+﻿@model WebsiteBanHang.Models.Category
+
+<h2>➕ Thêm danh mục sách</h2>
+
+<div class="card shadow p-4">
+
+<form asp-action="Add" method="post">
+
+    <div class="form-group mb-3">
+        <label>Tên danh mục</label>
+        <input asp-for="Name" class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Lưu
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Quay lại
+    </a>
+
+</form>
+
+</div>

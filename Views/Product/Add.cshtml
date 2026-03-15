@@ -1,36 +1,75 @@
-﻿@model WebsiteBanHang.Models.Product
-@using Microsoft.AspNetCore.Mvc.Rendering
+﻿```html
+@model WebsiteBanHang.Models.Product
+
 @{
-ViewData["Title"] = "Add Product";
+    ViewData["Title"] = "Add Product";
 }
-<h2>Add Product</h2>
-<form asp-action="Add" method="post" enctype="multipart/form-data">
-<div class="form-group">
-<label asp-for="Name"></label>
-<input asp-for="Name" class="form-control" />
-<span asp-validation-for="Name" class="text-danger"></span>
-</div>
-<div class="form-group">
-<label asp-for="Price"></label>
-<input asp-for="Price" class="form-control" />
-<span asp-validation-for="Price" class="text-danger"></span>
-</div>
-<div class="form-group">
-        <label asp-for="Description"></label>
-<textarea asp-for="Description" class="form-control"></textarea>
 
-        <span asp-validation-for="Description" class="text-
-danger"></span>
+<div class="container mt-5">
 
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>📚 Thêm Sách Mới</h3>
+                </div>
+
+                <div class="card-body">
+
+                    <form asp-action="Add" method="post" enctype="multipart/form-data">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên sách</label>
+                            <input asp-for="Name" class="form-control" placeholder="Nhập tên sách..." />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Giá sách</label>
+                            <input asp-for="Price" class="form-control" placeholder="Nhập giá sách..." />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="3"
+                                      placeholder="Nhập mô tả sách..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Danh mục</label>
+                            <select asp-for="CategoryId"
+                                    asp-items="ViewBag.Categories"
+                                    class="form-control">
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Ảnh sách</label>
+                            <input type="file" name="ImageUrl" class="form-control" />
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Index" class="btn btn-secondary">
+                                ← Quay lại
+                            </a>
+
+                            <button type="submit" class="btn btn-success">
+                                ✔ Thêm sản phẩm
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="CategoryId">Category</label>
-        <select asp-for="CategoryId" asp-items="ViewBag.Categories"
-                class="form-control"></select>
-    </div>
-    <div class="form-group">
-        <label asp-for="ImageUrl">Product Image</label>
-        <input type="file" asp-for="ImageUrl" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Add</button>
-</form>
+
+</div>
+```
