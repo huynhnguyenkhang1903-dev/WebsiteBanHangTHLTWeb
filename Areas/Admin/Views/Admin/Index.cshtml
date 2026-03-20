@@ -1,0 +1,46 @@
+﻿@model List<WebsiteBanHang.Areas.Admin.Controllers.UserViewModel>
+
+<h2 class="text-center text-primary mb-4">👑 Quản lý tài khoản</h2>
+
+<div class="container">
+
+    <table class="table table-bordered table-hover shadow">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Email</th>
+                <th>Họ tên</th>
+                <th>Role</th>
+                <th>Chức năng</th>
+            </tr>
+        </thead>
+        <a asp-area=""
+           asp-controller="Product"
+           asp-action="Index"
+           class="btn btn-primary mb-3">
+            🏠 Trang chủ
+        </a>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.FullName</td>
+
+                    <td class="text-center">
+                        <span class="badge bg-info">@user.Role</span>
+                    </td>
+
+                    <td class="text-center">
+                        <a asp-action="ChangeRole"
+                           asp-route-id="@user.Id"
+                           class="btn btn-warning btn-sm">
+                            🔄 Đổi Role
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>

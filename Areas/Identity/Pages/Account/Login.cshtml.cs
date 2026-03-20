@@ -8,10 +8,14 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager)
+        public LoginModel(
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [BindProperty]
@@ -25,8 +29,10 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
             public string Password { get; set; } = "";
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
+            returnUrl ??= Url.Content("~/");
+
             var result = await _signInManager.PasswordSignInAsync(
                 Input.Email,
                 Input.Password,
@@ -35,7 +41,16 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Product");
+                var user = await _userManager.FindByEmailAsync(Input.Email);
+
+                // 👑 ADMIN
+                if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    return RedirectToAction("Index", "Admin", new { area = "Admin" });
+                }
+
+                // 👤 USER
+                return RedirectToAction("Index", "Home"); // ✅ CHUẨN
             }
 
             ErrorMessage = "Sai email hoặc mật khẩu!";

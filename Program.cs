@@ -6,31 +6,37 @@ using WebsiteBanHang.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC
-builder.Services.AddControllersWithViews();
-
-// Database
+// ================== DATABASE ==================
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Identity
-builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+// ================== IDENTITY ==================
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
-.AddRoles<IdentityRole>() // thêm role
-.AddEntityFrameworkStores<ApplicationDbContext>();
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
-builder.Services.AddRazorPages();
+// ================== COOKIE ==================
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
-// Dependency Injection
+// ================== REPOSITORY ==================
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 
+// ================== MVC ==================
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
-
-// Middleware
+// ================== MIDDLEWARE ==================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -45,61 +51,102 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ================== ROUTE ==================
 
-// Route MVC
+// 👑 AREA
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}"
+);
+
+// 🏠 DEFAULT
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
-
-// Route Identity
 app.MapRazorPages();
 
 
-// =======================
-// TẠO ROLE + ADMIN MẶC ĐỊNH
-// =======================
-
+// ================== SEED DATA ==================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
+    var context = services.GetRequiredService<ApplicationDbContext>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-    // Tạo role Admin
+    string adminEmail = "admin@gmail.com";
+    string password = "Admin123!";
+
+    // ===== ROLE =====
     if (!await roleManager.RoleExistsAsync("Admin"))
-    {
         await roleManager.CreateAsync(new IdentityRole("Admin"));
-    }
 
-    // Tạo role User
     if (!await roleManager.RoleExistsAsync("User"))
-    {
         await roleManager.CreateAsync(new IdentityRole("User"));
-    }
 
-    // Tạo tài khoản Admin mặc định
-    var adminEmail = "admin@gmail.com";
-    var adminPassword = "Admin@123";
+    // ===== ADMIN =====
+    var user = await userManager.FindByEmailAsync(adminEmail);
 
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-    if (adminUser == null)
+    if (user == null)
     {
-        var user = new ApplicationUser
+        user = new ApplicationUser
         {
             UserName = adminEmail,
             Email = adminEmail,
-            FullName = "Administrator"
+            FullName = "Admin",
+            Address = "HCM",
+            Age = 20
         };
 
-        var result = await userManager.CreateAsync(user, adminPassword);
+        var result = await userManager.CreateAsync(user, password);
 
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(user, "Admin");
         }
+        else
+        {
+            foreach (var error in result.Errors)
+            {
+                Console.WriteLine("ERROR: " + error.Description);
+            }
+        }
+    }
+
+    // ===== CATEGORY =====
+    if (!context.Categories.Any())
+    {
+        context.Categories.Add(new Category
+        {
+            Name = "Sách tổng hợp"
+        });
+        context.SaveChanges();
+    }
+
+    // ===== PRODUCT (10 mẫu) =====
+    if (!context.Products.Any())
+    {
+        var categoryId = context.Categories.First().Id;
+
+        var products = new List<Product>();
+
+        for (int i = 1; i <= 10; i++)
+        {
+            products.Add(new Product
+            {
+                Name = "Sách hay " + i,
+                Price = 50000 + i * 1000,
+                Description = "Mô tả sách số " + i,
+                ImageUrl = "https://picsum.photos/300/400?random=" + i,
+                CategoryId = categoryId
+            });
+        }
+
+        context.Products.AddRange(products);
+        context.SaveChanges();
     }
 }
 

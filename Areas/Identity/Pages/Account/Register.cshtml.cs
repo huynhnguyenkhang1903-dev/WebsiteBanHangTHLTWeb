@@ -17,7 +17,7 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
 
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
-
+        
         public List<string> Errors { get; set; } = new List<string>();
 
         public string? SuccessMessage { get; set; }
@@ -35,6 +35,13 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
             [DataType(DataType.Password)]
             [MinLength(6, ErrorMessage = "Mật khẩu phải từ 6 ký tự")]
             public string Password { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Địa chỉ không được để trống")]
+            public string Address { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Tuổi không được để trống")]
+            [Range(1, 100, ErrorMessage = "Tuổi không hợp lệ")]
+            public int Age { get; set; }
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -57,18 +64,21 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
             {
                 UserName = Input.Email,
                 Email = Input.Email,
-                FullName = Input.FullName
+                FullName = Input.FullName,
+                Address = Input.Address,
+                Age = Input.Age
             };
 
             var result = await _userManager.CreateAsync(user, Input.Password);
 
             if (result.Succeeded)
             {
-                SuccessMessage = "Tạo tài khoản thành công! Bạn có thể đăng nhập ngay.";
+                SuccessMessage = "Tạo tài khoản thành công!";
 
-                // reset form
+                // 👉 GÁN ROLE USER
+                await _userManager.AddToRoleAsync(user, "User");
+
                 Input = new InputModel();
-
                 return Page();
             }
 

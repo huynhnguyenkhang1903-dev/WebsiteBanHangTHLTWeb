@@ -23,15 +23,26 @@ namespace WebsiteBanHang.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        // Hiển thị danh sách sản phẩm (ai đăng nhập cũng xem được)
+        // ================== INDEX ==================
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var products = await _productRepository.GetAllAsync();
+            var products = await _productRepository.GetAllAsync() ?? new List<Product>();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                products = products
+                    .Where(p => !string.IsNullOrEmpty(p.Name) &&
+                                p.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
             return View(products);
         }
 
-        // Form thêm (Admin)
+        // ================== ADD (GET) ==================
         [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Add()
         {
@@ -40,15 +51,20 @@ namespace WebsiteBanHang.Controllers
             return View();
         }
 
-        // Xử lý thêm
+        // ================== ADD (POST) ==================
         [HttpPost]
         [Authorize(Roles = SD.Role_Admin)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(Product product, IFormFile? imageUrl)
         {
+            if (product.CategoryId == 0)
+            {
+                ModelState.AddModelError("", "Vui lòng chọn danh mục");
+            }
+
             if (ModelState.IsValid)
             {
-                if (imageUrl != null)
+                if (imageUrl != null && imageUrl.Length > 0)
                 {
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
@@ -63,7 +79,7 @@ namespace WebsiteBanHang.Controllers
             return View(product);
         }
 
-        // Lưu ảnh
+        // ================== SAVE IMAGE ==================
         private async Task<string> SaveImage(IFormFile image)
         {
             string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
@@ -83,7 +99,7 @@ namespace WebsiteBanHang.Controllers
             return "/images/" + fileName;
         }
 
-        // Chi tiết sản phẩm
+        // ================== DISPLAY ==================
         [AllowAnonymous]
         public async Task<IActionResult> Display(int id)
         {
@@ -95,7 +111,7 @@ namespace WebsiteBanHang.Controllers
             return View(product);
         }
 
-        // Form cập nhật (Admin)
+        // ================== UPDATE (GET) ==================
         [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Update(int id)
         {
@@ -105,13 +121,12 @@ namespace WebsiteBanHang.Controllers
                 return NotFound();
 
             var categories = await _categoryRepository.GetAllAsync();
-
             ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
 
             return View(product);
         }
 
-        // Xử lý cập nhật
+        // ================== UPDATE (POST) ==================
         [HttpPost]
         [Authorize(Roles = SD.Role_Admin)]
         [ValidateAntiForgeryToken]
@@ -129,7 +144,7 @@ namespace WebsiteBanHang.Controllers
                 if (existingProduct == null)
                     return NotFound();
 
-                if (imageUrl != null)
+                if (imageUrl != null && imageUrl.Length > 0)
                 {
                     existingProduct.ImageUrl = await SaveImage(imageUrl);
                 }
@@ -150,7 +165,7 @@ namespace WebsiteBanHang.Controllers
             return View(product);
         }
 
-        // Form xóa
+        // ================== DELETE (GET) ==================
         [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Delete(int id)
         {
@@ -162,14 +177,13 @@ namespace WebsiteBanHang.Controllers
             return View(product);
         }
 
-        // Xử lý xóa
+        // ================== DELETE (POST) ==================
         [HttpPost, ActionName("DeleteConfirmed")]
         [Authorize(Roles = SD.Role_Admin)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _productRepository.DeleteAsync(id);
-
             return RedirectToAction(nameof(Index));
         }
     }

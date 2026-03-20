@@ -101,3 +101,110 @@ footer {
 .btn {
     border-radius: 8px;
 }
+/* ================= HERO (Trang chủ) ================= */
+.hero-section {
+    height: 80vh;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1512820790803-83ca734da794');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    text-align: center;
+}
+
+/* ================= CARD SÁCH ================= */
+.book-card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+    .book-card img {
+        height: 250px;
+        object-fit: cover;
+    }
+
+    .book-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+/* ================= HOVER BUTTON ================= */
+.btn {
+    transition: all 0.3s ease;
+}
+
+    .btn:hover {
+        transform: scale(1.05);
+    }
+
+/* ================= ANIMATION FADE ================= */
+.fade-in {
+    animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================= LOGIN / REGISTER ================= */
+.auth-wrapper {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 12px;
+}
+
+/* ================= NAVBAR ================= */
+.navbar-brand {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.nav-link {
+    transition: 0.2s;
+}
+
+    .nav-link:hover {
+        color: #0d6efd !important;
+    }
+
+/* ================= IMAGE ZOOM ================= */
+img {
+    transition: transform 0.3s ease;
+}
+
+    img:hover {
+        transform: scale(1.05);
+    }
+
+/* ================= TABLE ================= */
+.table tr:hover {
+    background-color: #f1f5ff;
+}
+
+/* ================= SCROLLBAR (ĐẸP HƠN) ================= */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #0d6efd;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
