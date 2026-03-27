@@ -17,7 +17,15 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+// SESSION
+builder.Services.AddDistributedMemoryCache();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 // ================== COOKIE ==================
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -42,7 +50,16 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
+// 👇 PHẢI đặt ở đây
+app.UseSession();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -76,6 +93,9 @@ using (var scope = app.Services.CreateScope())
     var context = services.GetRequiredService<ApplicationDbContext>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    // 🔥 ĐẢM BẢO DATABASE TỒN TẠI
+    context.Database.Migrate();
 
     string adminEmail = "admin@gmail.com";
     string password = "Admin123!";
@@ -123,10 +143,10 @@ using (var scope = app.Services.CreateScope())
         {
             Name = "Sách tổng hợp"
         });
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
-    // ===== PRODUCT (10 mẫu) =====
+    // ===== PRODUCT =====
     if (!context.Products.Any())
     {
         var categoryId = context.Categories.First().Id;
@@ -146,7 +166,7 @@ using (var scope = app.Services.CreateScope())
         }
 
         context.Products.AddRange(products);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 }
 

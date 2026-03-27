@@ -1,0 +1,63 @@
+﻿@model ShoppingCart
+
+<h2>Giỏ hàng</h2>
+
+<form asp-action="Checkout" method="post">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Chọn</th>
+                <th>Sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Tổng</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selectedItems" value="@item.ProductId" checked />
+                    </td>
+
+                    <td>@item.Name</td>
+                    <td>@item.Price.ToString("N0")</td>
+
+                    <td>
+                        <a asp-action="Decrease" asp-route-id="@item.ProductId" class="btn btn-sm btn-warning">-</a>
+                        @item.Quantity
+                        <a asp-action="Increase" asp-route-id="@item.ProductId" class="btn btn-sm btn-success">+</a>
+                    </td>
+
+                    <td>@(item.Price * item.Quantity)</td>
+
+                    <td>
+                        <a asp-action="Remove" asp-route-id="@item.ProductId" class="btn btn-danger btn-sm">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Tổng tiền: @Model.Items.Sum(x => x.Price * x.Quantity).ToString("N0")</h4>
+
+    <hr />
+
+    <!-- Chọn phương thức thanh toán -->
+    <div class="form-group">
+        <label>Phương thức thanh toán:</label>
+        <select name="PaymentMethod" class="form-control">
+            <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+            <option value="Momo">Momo</option>
+            <option value="VNPay">VNPay</option>
+        </select>
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">Thanh toán</button>
+
+</form>

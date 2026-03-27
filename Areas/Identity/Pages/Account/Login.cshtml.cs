@@ -33,27 +33,42 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
 
+            var user = await _userManager.FindByEmailAsync(Input.Email);
+
+            // 🔥 FIX NULL (QUAN TRỌNG NHẤT)
+            if (user == null)
+            {
+                ErrorMessage = "Email không tồn tại!";
+                return Page();
+            }
+
+            // 🔥 CHECK USERNAME
+            if (string.IsNullOrEmpty(user.UserName))
+            {
+                ErrorMessage = "Tài khoản không hợp lệ (thiếu username)";
+                return Page();
+            }
+
             var result = await _signInManager.PasswordSignInAsync(
-                Input.Email,
+                user.UserName,
                 Input.Password,
                 false,
-                false);
+                false
+            );
 
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(Input.Email);
-
                 // 👑 ADMIN
-                if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
                 {
                     return RedirectToAction("Index", "Admin", new { area = "Admin" });
                 }
 
                 // 👤 USER
-                return RedirectToAction("Index", "Home"); // ✅ CHUẨN
+                return RedirectToAction("Index", "Home", new { area = "" });
             }
 
-            ErrorMessage = "Sai email hoặc mật khẩu!";
+            ErrorMessage = "Sai mật khẩu!";
             return Page();
         }
     }
